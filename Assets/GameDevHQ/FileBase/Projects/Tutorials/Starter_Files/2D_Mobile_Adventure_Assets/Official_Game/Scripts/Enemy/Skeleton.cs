@@ -1,10 +1,14 @@
+
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LemApperson_2D_Mobile_Adventure
 {
-    public class Skeleton : Enemy
+    public class Skeleton : Enemy, IDamageable
     {
+        public override void Awake() {
+            base.Awake();
+        }
+
 
     }
 }

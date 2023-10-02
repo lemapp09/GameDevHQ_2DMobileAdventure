@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 
 namespace  LemApperson_2D_Mobile_Adventure
 {
-    public class Player : MonoBehaviour
+    public class Player : MonoBehaviour, IDamageable
     {
         private PlayerMovement _input;
         [SerializeField] private Rigidbody2D _rigidbody;
@@ -15,6 +15,7 @@ namespace  LemApperson_2D_Mobile_Adventure
         [SerializeField] private PlayerAnimation _playerAnim;
         [SerializeField] private LayerMask _groundLayer;
         private bool _resetJump;
+        public int Health { get; set; }
 
         private void Awake() {
             _input = new PlayerMovement();
@@ -27,8 +28,11 @@ namespace  LemApperson_2D_Mobile_Adventure
             _playerSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
             _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _jumpForce * 0.33f);
         }
-
-
+        
+        public void Damage() {
+            Debug.Log("Player Damage");
+        }
+        
         private void MoveRight(InputAction.CallbackContext context) {
             MovePlayer(_input.Player.MoveRight.ReadValue<float>());
             _playerSpriteRenderer.flipX = false;
@@ -55,14 +59,6 @@ namespace  LemApperson_2D_Mobile_Adventure
                 _playerAnim.Swing();
             }
         }
-        
-        private void OnEnable() {
-            _input.Enable();
-        }
-
-        private void OnDisable() {
-            _input.Disable();
-        }
 
         private void MovePlayer(float horizontalInput) {
             _rigidbody.velocity = new Vector2(horizontalInput * _speed, _rigidbody.velocity.y);
@@ -71,7 +67,8 @@ namespace  LemApperson_2D_Mobile_Adventure
 
         private bool CheckIsGrounded() {
             if (!_resetJump) {
-                RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, Vector2.down, 0.76f, _groundLayer);
+                RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, Vector2.down,
+                    0.76f, _groundLayer);
                 if (hitInfo.collider != null) {
                     return true;
                 }
@@ -86,6 +83,14 @@ namespace  LemApperson_2D_Mobile_Adventure
             yield return new WaitForSeconds(0.74f);
             _playerAnim.Jump(false);
             _resetJump = false;
+        }
+        
+        private void OnEnable() {
+            _input.Enable();
+        }
+
+        private void OnDisable() {
+            _input.Disable();
         }
     }
 }

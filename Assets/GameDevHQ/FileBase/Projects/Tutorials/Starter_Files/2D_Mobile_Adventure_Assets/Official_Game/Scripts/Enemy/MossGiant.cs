@@ -1,13 +1,13 @@
 
-using System;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LemApperson_2D_Mobile_Adventure
 {
-    public class MossGiant : Enemy
+    public class MossGiant : Enemy, IDamageable
     {
-
+    public override void Awake() {
+        base.Awake();
+    }
+    
     }
 }

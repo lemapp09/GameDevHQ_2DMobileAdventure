@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace  LemApperson_2D_Mobile_Adventure
@@ -6,33 +7,98 @@ namespace  LemApperson_2D_Mobile_Adventure
     {
         [SerializeField] protected Animator _enemy_Anim;
         [SerializeField] protected SpriteRenderer _enemy_Sprite;
-        [SerializeField] protected int health;
-        [SerializeField] protected int speed;
-        [SerializeField] protected int gems;
+        [SerializeField] protected int health, speed , gems;
         [SerializeField] protected  Transform pointA, pointB;
-        protected int _idleID;
-        protected Vector2 destination;
-        protected bool _isIdle;
-
+        [SerializeField] protected int idleID ,hitID , deathID,attackID,inCombatID;
+        [SerializeField] protected Vector2 destination, direction;
+        [SerializeField] protected bool _isIdle, _isFacingLeft, _isHit, _isInCombat, _isDead;
+        protected Player _player;
 
         public virtual void Awake() {
-            _idleID = Animator.StringToHash("Idle");
+            _player = FindObjectOfType<Player>();
+            if(_player == null) Debug.Log("Player was not found");
+            idleID = Animator.StringToHash("Idle");
+            hitID = Animator.StringToHash("Hit");
+            deathID = Animator.StringToHash("Death");
+            attackID = Animator.StringToHash("Attack");
+            inCombatID = Animator.StringToHash("InCombat");
         }
-        public virtual void Update()
-        {
-            _isIdle = _enemy_Anim.GetCurrentAnimatorStateInfo(0).IsName("Idle");
-            if (!_isIdle) {
+        public virtual void Update() {
+            if (!_isIdle && !_isHit && !_isInCombat && !_isDead) {
                 if(transform.position.x <= pointA.position.x) {
                     destination = new Vector2(pointB.position.x, pointB.position.y);
-                    _enemy_Anim.SetTrigger(_idleID);
-                    _enemy_Sprite.flipX = false;
+                    _enemy_Anim.SetTrigger(idleID);
+                    _isFacingLeft = false;
+                    _enemy_Sprite.flipX = _isFacingLeft;
                 } else if(transform.position.x >= pointB.position.x) {
                     destination = new Vector2(pointA.position.x, pointA.position.y);
-                    _enemy_Anim.SetTrigger(_idleID);
-                    _enemy_Sprite.flipX = true;
+                    _enemy_Anim.SetTrigger(idleID);
+                    _isFacingLeft = true;
+                    _enemy_Sprite.flipX = _isFacingLeft;
                 }
                 transform.position = Vector2.MoveTowards(transform.position, 
                     new Vector2(destination.x, destination.y), speed * Time.deltaTime);
+            }
+            if (_isHit ){    
+                if (PlayerIsClose()) {
+                    _enemy_Anim.SetBool(inCombatID, true);
+                    _isInCombat = true;
+                }  else {
+                    _isHit = false;
+                    _isInCombat = false;
+                    _enemy_Sprite.flipX = _isFacingLeft;
+                    _enemy_Anim.SetBool(inCombatID, false);
+                }
+            }
+            if (_isInCombat) {
+                if (direction.x > 0) {
+                    _enemy_Sprite.flipX = false;
+                }  else {
+                    _enemy_Sprite.flipX = true;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// The Enemy Idle & Hit animation triggers these methods
+        /// </summary>
+        /// <param name="EnemyIdleAnimation_stateHash"></param>
+        public void OnAnimationStateEntered(int stateHash) {
+            if (stateHash == idleID) {
+                _isIdle = true;
+            }
+            if (stateHash == hitID) {
+                if (!_isInCombat) {
+                    _isHit = false;
+                }
+            }
+        }
+
+        public void OnAnimationStateExited(int stateHash) {
+            if (stateHash == idleID) {
+                _isIdle = false;
+            }
+        }
+
+        public virtual void DestroyThisEnemy() {
+            Destroy(this.gameObject);
+        }
+
+        public virtual bool PlayerIsClose()
+        {
+            direction = _player.transform.position - transform.position;
+            return ((Vector3.Distance(this.transform.position, _player.transform.position)) < 2.0f);
+        }
+        public virtual void Damage() {
+            if(!_isHit && !_isDead) {
+                health--;
+                _enemy_Anim.SetTrigger(hitID);
+                _isHit = true;
+                if (health < 1 && !_isDead) {
+                    _isDead = true;
+                    _enemy_Anim.SetTrigger(deathID);
+                    Invoke(nameof(DestroyThisEnemy), 5f);
+                }
             }
         }
     }
