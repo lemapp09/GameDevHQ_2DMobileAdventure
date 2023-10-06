@@ -6,12 +6,13 @@ namespace  LemApperson_2D_Mobile_Adventure
 {
     public class Player : MonoBehaviour, IDamageable
     {
+        // variable for amount of diamonds
+        private int _numberOfDiamonds;
         private PlayerMovement _input;
         [SerializeField] private Rigidbody2D _rigidbody;
         [SerializeField] private SpriteRenderer _playerSpriteRenderer;
         [SerializeField] private SpriteRenderer _swordArcSpriteRenderer;
-        [SerializeField] private float _speed = 1.0f;
-        [SerializeField] private float _jumpForce = 5.0f;
+        [SerializeField] private float _health = 5,  _speed = 1.0f,  _jumpForce = 5.0f;
         [SerializeField] private PlayerAnimation _playerAnim;
         [SerializeField] private LayerMask _groundLayer;
         private bool _resetJump;
@@ -30,9 +31,18 @@ namespace  LemApperson_2D_Mobile_Adventure
         }
         
         public void Damage() {
-            Debug.Log("Player Damage");
+            _health--;
+            if (_health < 1) {
+                _playerAnim.Death();
+                // Game Over
+                Destroy(gameObject, 0.8f);
+            }
         }
-        
+
+        public void CollectGems(int NumberOfGems) {
+            _numberOfDiamonds += NumberOfGems;
+        }
+
         private void MoveRight(InputAction.CallbackContext context) {
             MovePlayer(_input.Player.MoveRight.ReadValue<float>());
             _playerSpriteRenderer.flipX = false;

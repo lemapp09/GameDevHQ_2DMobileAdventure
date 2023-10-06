@@ -9,9 +9,10 @@ namespace  LemApperson_2D_Mobile_Adventure
         [SerializeField] protected SpriteRenderer _enemy_Sprite;
         [SerializeField] protected int health, speed , gems;
         [SerializeField] protected  Transform pointA, pointB;
-        [SerializeField] protected int idleID ,hitID , deathID,attackID,inCombatID;
-        [SerializeField] protected Vector2 destination, direction;
-        [SerializeField] protected bool _isIdle, _isFacingLeft, _isHit, _isInCombat, _isDead;
+        [SerializeField] protected GameObject diamondPrefab;
+        protected int idleID ,hitID , deathID,attackID,inCombatID, speedID;
+        protected Vector2 destination, direction;
+        protected bool _isIdle, _isFacingLeft, _isHit, _isInCombat, _isDead;
         protected Player _player;
 
         public virtual void Awake() {
@@ -22,6 +23,7 @@ namespace  LemApperson_2D_Mobile_Adventure
             deathID = Animator.StringToHash("Death");
             attackID = Animator.StringToHash("Attack");
             inCombatID = Animator.StringToHash("InCombat");
+            speedID = Animator.StringToHash("Speed");
         }
         public virtual void Update() {
             if (!_isIdle && !_isHit && !_isInCombat && !_isDead) {
@@ -40,7 +42,7 @@ namespace  LemApperson_2D_Mobile_Adventure
                     new Vector2(destination.x, destination.y), speed * Time.deltaTime);
             }
             if (_isHit ){    
-                if (PlayerIsClose()) {
+                if (PlayerIsClose(2.0f)) {
                     _enemy_Anim.SetBool(inCombatID, true);
                     _isInCombat = true;
                 }  else {
@@ -84,10 +86,10 @@ namespace  LemApperson_2D_Mobile_Adventure
             Destroy(this.gameObject);
         }
 
-        public virtual bool PlayerIsClose()
+        public virtual bool PlayerIsClose(float distanceAway)
         {
             direction = _player.transform.position - transform.position;
-            return ((Vector3.Distance(this.transform.position, _player.transform.position)) < 2.0f);
+            return ((Vector3.Distance(this.transform.position, _player.transform.position)) < distanceAway);
         }
         public virtual void Damage() {
             if(!_isHit && !_isDead) {
@@ -98,6 +100,8 @@ namespace  LemApperson_2D_Mobile_Adventure
                     _isDead = true;
                     _enemy_Anim.SetTrigger(deathID);
                     Invoke(nameof(DestroyThisEnemy), 5f);
+                    GameObject diamond = Instantiate(diamondPrefab, transform.position, Quaternion.identity);
+                    diamond.GetComponent<Diamond>()?.SetNumberOfDiamonds( gems );
                 }
             }
         }
