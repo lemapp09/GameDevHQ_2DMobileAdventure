@@ -42,7 +42,12 @@ namespace LemApperson_2D_Mobile_Adventure.Managers
         }
 
         public void UpDateHealthCount(int health) {
-            _lifeBars[health].SetActive(false);
+            for (int i = 0; i < 4; i++) {
+                _lifeBars[i].SetActive(false);
+            }
+            for (int j = 0; j < health; j++) {
+                _lifeBars[j].SetActive(true);
+            }
         }
     }
 }

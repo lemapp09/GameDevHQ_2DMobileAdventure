@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using LemApperson_2D_Mobile_Adventure.Managers;
 using StarterAssets;
@@ -16,7 +17,7 @@ namespace  LemApperson_2D_Mobile_Adventure.Player
         [SerializeField] private Rigidbody2D _rigidbody;
         [SerializeField] private SpriteRenderer _playerSpriteRenderer;
         [SerializeField] private SpriteRenderer _swordArcSpriteRenderer;
-        [SerializeField] private int _health = 4;
+        [SerializeField] private int _health = 4, jumpCount = 0, maxJumps = 2;
         [SerializeField] private float _speed = 1.0f,  _jumpForce = 7.5f;
         [SerializeField] private PlayerAnimation _playerAnim;
         [SerializeField] private LayerMask _groundLayer;
@@ -49,15 +50,13 @@ namespace  LemApperson_2D_Mobile_Adventure.Player
                     _playerAnim.Death();
                 }
                 AudioManager.Instance.SFX(5);
-                // Game Over
-                Destroy(gameObject, 0.8f);
+                GameManager.Instance.LoadMainMenu();
             }
         }
 
         public void CollectGems(int NumberOfGems) {
             _numberOfDiamonds += NumberOfGems;
             UIManager.Instance.UpDateGemCount(_numberOfDiamonds);
-            Debug.Log("Gems Collected: " + NumberOfGems);   
         }
 
         public int HowManyGems() {
@@ -115,20 +114,20 @@ namespace  LemApperson_2D_Mobile_Adventure.Player
         private void Jump(InputAction.CallbackContext context) {
             if (!_isAndroid)
             {
-                if (CheckIsGrounded())
+                if (CheckIsGrounded() || (jumpCount > 0 && jumpCount < maxJumps) )
                 {
                     _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _jumpForce);
+                    jumpCount++;
                     StartCoroutine(ResetJumpRoutine());
                 }
             }
         }
 
         public void Jump() {
-            if (_isAndroid)
-            {
-                if (CheckIsGrounded())
-                {
+            if (_isAndroid) {
+                if (CheckIsGrounded()  || (jumpCount > 0 && jumpCount < maxJumps)) {
                     _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _jumpForce);
+                    jumpCount++;
                     StartCoroutine(ResetJumpRoutine());
                 }
             }
@@ -139,10 +138,8 @@ namespace  LemApperson_2D_Mobile_Adventure.Player
         }
         
         private void Swing(InputAction.CallbackContext context) { // AKA Attack
-            if (!_isAndroid && !_isInShop)
-            {
-                if (CheckIsGrounded() && _playerAnim != null)
-                {
+            if (!_isAndroid && !_isInShop) {
+                if (CheckIsGrounded() && _playerAnim != null) {
                     _playerAnim.Swing();
                     AudioManager.Instance.SFX(4);
                 }
@@ -150,10 +147,8 @@ namespace  LemApperson_2D_Mobile_Adventure.Player
         }
         
         public void Swing() { // AKA Attack
-            if (_isAndroid)
-            {
-                if (CheckIsGrounded() && _playerAnim != null)
-                {
+            if (_isAndroid) {
+                if (CheckIsGrounded() && _playerAnim != null) {
                     _playerAnim.Swing();
                     AudioManager.Instance.SFX(4);
                 }
@@ -178,13 +173,18 @@ namespace  LemApperson_2D_Mobile_Adventure.Player
             return false;
         }
 
+
         private IEnumerator ResetJumpRoutine() {
-            if (_playerAnim != null) {
+            if (_playerAnim != null && jumpCount == 1) {
                 _playerAnim.Jump(true);
                 _resetJump = true;
                 yield return new WaitForSeconds(0.74f);
                 _playerAnim.Jump(false);
                 _resetJump = false;
+            }
+            if (jumpCount > 1) {
+                yield return new WaitForSeconds(1f);
+                jumpCount = 0;
             }
         }
 
@@ -204,6 +204,13 @@ namespace  LemApperson_2D_Mobile_Adventure.Player
         private void OnDisable() {
             _input.Disable();
             _input.Player.Disable();
+        }
+
+        public void AddALife() {
+            if (_health < 4) {
+                _health++;
+                UIManager.Instance.UpDateHealthCount(_health);
+            }
         }
     }
 }

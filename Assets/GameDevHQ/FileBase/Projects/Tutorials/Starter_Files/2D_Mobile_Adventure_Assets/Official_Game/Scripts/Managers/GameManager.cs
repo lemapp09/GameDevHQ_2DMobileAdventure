@@ -1,3 +1,4 @@
+using UnityEngine.SceneManagement;
 
 using UnityEngine;
 
@@ -11,6 +12,10 @@ namespace LemApperson_2D_Mobile_Adventure.Managers
 
         public void RewardGems(int numberOfGems) {
             _player.CollectGems(numberOfGems);
+        }
+
+        public void LoadMainMenu() {
+            SceneManager.LoadScene("MainMenu");
         }
     }
 }
