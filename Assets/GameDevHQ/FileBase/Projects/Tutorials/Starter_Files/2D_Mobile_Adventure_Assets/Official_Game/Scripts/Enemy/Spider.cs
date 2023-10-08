@@ -1,9 +1,7 @@
-using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
-namespace LemApperson_2D_Mobile_Adventure
+namespace LemApperson_2D_Mobile_Adventure.Enemy
 {
     public class Spider : Enemy, IDamageable
     {
@@ -16,13 +14,14 @@ namespace LemApperson_2D_Mobile_Adventure
         }
         
         public override void Damage() {
-            health--;
-            if (health < 1) {
-                _isDead = true;
-                GameObject diamond = Instantiate(diamondPrefab, transform.position, Quaternion.identity);
-                diamond.GetComponent<Diamond>()?.SetNumberOfDiamonds( gems );
-                _enemy_Anim.SetTrigger(deathID);
-                Destroy(this.gameObject, 0.8f);
+            if (!_isDead) {
+                health--;
+                if (health < 1) {
+                    _isDead = true;
+                    GameObject diamond = Instantiate(diamondPrefab, transform.position, Quaternion.identity);
+                    diamond.GetComponent<Diamond>()?.SetNumberOfDiamonds(gems);
+                    _enemy_Anim.SetTrigger(deathID);
+                }
             }
         }
          

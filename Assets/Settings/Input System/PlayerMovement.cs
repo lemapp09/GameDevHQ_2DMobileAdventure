@@ -100,6 +100,28 @@ public partial class @PlayerMovement: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""d7aee286-6f1f-405a-95f3-6ac6270868a7"",
+                    ""path"": ""<Joystick>/stick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f9e70c46-09d3-46ab-a8c2-fdb12ebb197c"",
+                    ""path"": ""<AndroidJoystick>/stick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""988fbd16-4c3a-4a01-a547-0fc1b0741cfe"",
                     ""path"": ""<Keyboard>/rightArrow"",
                     ""interactions"": """",
@@ -113,6 +135,28 @@ public partial class @PlayerMovement: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""f0259b01-42bf-4729-bac0-286568ff2cd2"",
                     ""path"": ""<Keyboard>/#(D)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""34cd6a7d-f4d4-487c-a537-888cb39241a1"",
+                    ""path"": ""<AndroidJoystick>/stick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""34200089-fb93-4f91-a646-c42c2e174d24"",
+                    ""path"": ""<AndroidJoystick>/stick/right"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

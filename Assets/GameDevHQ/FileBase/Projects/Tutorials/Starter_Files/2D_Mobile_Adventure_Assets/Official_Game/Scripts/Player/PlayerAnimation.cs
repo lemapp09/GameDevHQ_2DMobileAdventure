@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace  LemApperson_2D_Mobile_Adventure
+namespace  LemApperson_2D_Mobile_Adventure.Player
 {
     public class PlayerAnimation : MonoBehaviour
     {

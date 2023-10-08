@@ -1,7 +1,8 @@
+using LemApperson_2D_Mobile_Adventure.Managers;
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace  LemApperson_2D_Mobile_Adventure
+namespace  LemApperson_2D_Mobile_Adventure.Enemy
 {
     public abstract class Enemy : MonoBehaviour
     {
@@ -13,10 +14,10 @@ namespace  LemApperson_2D_Mobile_Adventure
         protected int idleID ,hitID , deathID,attackID,inCombatID, speedID;
         protected Vector2 destination, direction;
         protected bool _isIdle, _isFacingLeft, _isHit, _isInCombat, _isDead;
-        protected Player _player;
+        protected Player.Player _player;
 
         public virtual void Awake() {
-            _player = FindObjectOfType<Player>();
+            _player = FindObjectOfType<Player.Player>();
             if(_player == null) Debug.Log("Player was not found");
             idleID = Animator.StringToHash("Idle");
             hitID = Animator.StringToHash("Hit");
@@ -41,18 +42,15 @@ namespace  LemApperson_2D_Mobile_Adventure
                 transform.position = Vector2.MoveTowards(transform.position, 
                     new Vector2(destination.x, destination.y), speed * Time.deltaTime);
             }
-            if (_isHit ){    
+            if (_isInCombat ){    
                 if (PlayerIsClose(2.0f)) {
                     _enemy_Anim.SetBool(inCombatID, true);
                     _isInCombat = true;
                 }  else {
-                    _isHit = false;
                     _isInCombat = false;
                     _enemy_Sprite.flipX = _isFacingLeft;
                     _enemy_Anim.SetBool(inCombatID, false);
                 }
-            }
-            if (_isInCombat) {
                 if (direction.x > 0) {
                     _enemy_Sprite.flipX = false;
                 }  else {
@@ -70,9 +68,7 @@ namespace  LemApperson_2D_Mobile_Adventure
                 _isIdle = true;
             }
             if (stateHash == hitID) {
-                if (!_isInCombat) {
                     _isHit = false;
-                }
             }
         }
 
@@ -80,26 +76,30 @@ namespace  LemApperson_2D_Mobile_Adventure
             if (stateHash == idleID) {
                 _isIdle = false;
             }
+
+            if (stateHash == deathID) {
+                AudioManager.Instance.SFX(5);
+                Destroy(this.gameObject);
+            }
         }
 
-        public virtual void DestroyThisEnemy() {
-            Destroy(this.gameObject);
+        public virtual bool PlayerIsClose(float distanceAway) {
+            if (_player != null) {
+                direction = _player.transform.position - transform.position;
+                return ((Vector3.Distance(this.transform.position, _player.transform.position)) < distanceAway);
+            }
+            return false;
         }
-
-        public virtual bool PlayerIsClose(float distanceAway)
-        {
-            direction = _player.transform.position - transform.position;
-            return ((Vector3.Distance(this.transform.position, _player.transform.position)) < distanceAway);
-        }
+        
         public virtual void Damage() {
             if(!_isHit && !_isDead) {
                 health--;
                 _enemy_Anim.SetTrigger(hitID);
                 _isHit = true;
+                _isInCombat = true;
                 if (health < 1 && !_isDead) {
                     _isDead = true;
                     _enemy_Anim.SetTrigger(deathID);
-                    Invoke(nameof(DestroyThisEnemy), 5f);
                     GameObject diamond = Instantiate(diamondPrefab, transform.position, Quaternion.identity);
                     diamond.GetComponent<Diamond>()?.SetNumberOfDiamonds( gems );
                 }

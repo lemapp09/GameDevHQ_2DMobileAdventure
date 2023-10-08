@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using LemApperson_2D_Mobile_Adventure;
 using UnityEngine;
 
-namespace LemApperson_2D_Mobile_Adventure
+namespace LemApperson_2D_Mobile_Adventure.Enemy
 {
 
     public class AcidEffect : MonoBehaviour
